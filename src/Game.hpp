@@ -3,8 +3,8 @@
 // SFML
 #include <SFML/Graphics.hpp>
 
-// STD
-#include <iostream>
+// OTHER CLASSES
+#include "Console/Console.hpp"
 
 class Game {
 private:

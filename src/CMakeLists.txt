@@ -9,6 +9,6 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(TheGameOfLife "main.cpp" "Game.cpp")
+add_executable(TheGameOfLife "main.cpp" "Game.cpp" "Console/Console.cpp")
 target_compile_features(TheGameOfLife PRIVATE cxx_std_17)
 target_link_libraries(TheGameOfLife PRIVATE sfml-system sfml-window sfml-graphics sfml-audio sfml-network)

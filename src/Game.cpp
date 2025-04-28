@@ -3,14 +3,11 @@
 Game::Game() :
 	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Default)
 {
-	std::cout << "Game instanciated at " << this << '\n';
 	m_deltaTime = 0.f;
 	m_isRunning = true;
 }
 
-Game::~Game() {
-	std::cout << "Game destroyed at " << this << '\n';
-}
+Game::~Game() {}
 
 void Game::run() {
 	init();
