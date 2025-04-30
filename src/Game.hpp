@@ -3,8 +3,8 @@
 // SFML
 #include <SFML/Graphics.hpp>
 
-// OTHER CLASSES
-#include "Console/Console.hpp"
+// MODULES
+import GameConsole;
 
 class Game {
 private:

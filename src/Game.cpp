@@ -1,13 +1,16 @@
 #include "Game.hpp"
 
 Game::Game() :
-	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Default)
+	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Fullscreen)
 {
 	m_deltaTime = 0.f;
 	m_isRunning = true;
 }
 
-Game::~Game() {}
+Game::~Game() 
+{
+	// May be used later
+}
 
 void Game::run() {
 	init();
@@ -22,7 +25,11 @@ void Game::run() {
 }
 
 void Game::init() {
-	return;
+	Console::Log("Initializing game...");
+
+	// Init steps
+
+	Console::Log("Finished game initialization.");
 }
 
 void Game::pollEvents() {

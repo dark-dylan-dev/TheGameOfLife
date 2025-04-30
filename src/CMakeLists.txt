@@ -1,5 +1,11 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Adding files
+add_executable(TheGameOfLife "main.cpp" "Game.cpp")
+target_sources(TheGameOfLife PUBLIC FILE_SET CXX_MODULES FILES "Modules/Console.ixx")
 
+# Requires C++23
+target_compile_features(TheGameOfLife PRIVATE cxx_std_23)
+
+# Including SFML 2.6.2
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -9,6 +15,4 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(TheGameOfLife "main.cpp" "Game.cpp" "Console/Console.cpp")
-target_compile_features(TheGameOfLife PRIVATE cxx_std_17)
 target_link_libraries(TheGameOfLife PRIVATE sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
