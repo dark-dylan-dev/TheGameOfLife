@@ -1,6 +1,6 @@
 # Adding files
 add_executable(TheGameOfLife "main.cpp" "Game.cpp")
-target_sources(TheGameOfLife PUBLIC FILE_SET CXX_MODULES FILES "Modules/Console.ixx")
+target_sources(TheGameOfLife PUBLIC FILE_SET CXX_MODULES FILES "Modules/Console.ixx" "Modules/GameSetup.ixx" "Modules/GameMenus.ixx")
 
 # Requires C++23
 target_compile_features(TheGameOfLife PRIVATE cxx_std_23)

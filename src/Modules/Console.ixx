@@ -34,20 +34,22 @@ export void Console::Log(const std::string& message, ImportanceLevel importance)
 	switch (importance) {
 	case BASIC:
 		std::cout << "Info" << '\n'
-			<< " > " << message << '\n' << '\n';
+			<< " > " << message << '\n';
 		break;
 
 	case PROBLEM:
 		std::cout << "Issue" << '\n'
-			<< " > " << message << '\n' << '\n';
+			<< " > " << message << '\n';
 		break;
 
 	case CRITICAL:
 		std::cout << "Critical" << '\n'
-			<< " > " << message << '\n' << '\n';
+			<< " > " << message << '\n';
 		break;
 
 	default:
 		break;
 	}
+
+	std::cout << '\n';
 }

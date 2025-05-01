@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 // MODULES
+import GameSetup;
 import GameConsole;
 
 class Game {

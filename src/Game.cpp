@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game() :
-	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Fullscreen)
+	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Default)
 {
 	m_deltaTime = 0.f;
 	m_isRunning = true;
@@ -27,7 +27,10 @@ void Game::run() {
 void Game::init() {
 	Console::Log("Initializing game...");
 
-	// Init steps
+	// Init
+	loadImages();
+	setupCursor(m_window);
+	setupIcon(m_window);
 
 	Console::Log("Finished game initialization.");
 }
