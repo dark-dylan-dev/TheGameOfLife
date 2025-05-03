@@ -6,6 +6,7 @@
 // MODULES
 import GameSetup;
 import GameConsole;
+import GameMenus;
 
 class Game {
 private:

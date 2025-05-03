@@ -31,6 +31,8 @@ void Game::init() {
 	loadImages();
 	setupCursor(m_window);
 	setupIcon(m_window);
+	loadMenus();
+	setupMenu(m_window, Start);
 
 	Console::Log("Finished game initialization.");
 }
@@ -38,6 +40,7 @@ void Game::init() {
 void Game::pollEvents() {
 	sf::Event event;
 	while (m_window.pollEvent(event)) {
+		pollMenuEvents(m_window, event, Start);
 		switch (event.type) {
 		case sf::Event::Closed:
 			m_isRunning = false;
@@ -54,6 +57,7 @@ void Game::render() {
 	m_window.clear();
 
 	// Draw
+	drawMenu(m_window, Start);
 
 	m_window.display();
 }
