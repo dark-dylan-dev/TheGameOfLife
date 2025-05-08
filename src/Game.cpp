@@ -1,16 +1,13 @@
 #include "Game.hpp"
 
 Game::Game() :
-	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::Style::Default)
+	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::State::Fullscreen)
 {
 	m_deltaTime = 0.f;
 	m_isRunning = true;
 }
 
-Game::~Game() 
-{
-	// May be used later
-}
+Game::~Game() = default;
 
 void Game::run() {
 	init();
@@ -21,13 +18,14 @@ void Game::run() {
 		render();
 	}
 
+	// Save shapes, progress and advancements here
+
 	m_window.close();
 }
 
 void Game::init() {
 	Console::Log("Initializing game...");
 
-	// Init
 	loadImages();
 	setupCursor(m_window);
 	setupIcon(m_window);
@@ -38,15 +36,8 @@ void Game::init() {
 }
 
 void Game::pollEvents() {
-	sf::Event event;
-	while (m_window.pollEvent(event)) {
-		pollMenuEvents(m_window, event, Start);
-		switch (event.type) {
-		case sf::Event::Closed:
-			m_isRunning = false;
-			break;
-		}
-	}
+	if (pollGameEvents(m_window, Start) != 0)
+		m_isRunning = false;
 }
 
 void Game::updateLoop() {

@@ -1,10 +1,12 @@
 module;
 
-#include <time.h> // For localtime_s(tm*, const time_t*);
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <ctime>
+#include <time.h>
 
 export module GameConsole;
-
-import std;
 
 export enum ImportanceLevel {
 	BASIC,
@@ -14,7 +16,6 @@ export enum ImportanceLevel {
 
 ////////////////////////////////////////////////////////////
 /// \brief Outputs timed messages in the console
-///
 ////////////////////////////////////////////////////////////
 export class Console {
 public:
@@ -24,7 +25,7 @@ public:
 export void Console::Log(const std::string& message, ImportanceLevel importance) {
 	// Get a formatted HH:MM:SS string of the current time (e.g: 11:23:54)
 	std::tm newTime;
-	std::time_t now = std::time(nullptr);
+	const std::time_t now = std::time(nullptr);
 	std::string time;
 	// Checks if localtime_s() was successful
 	if (localtime_s(&newTime, &now) != 0) {
@@ -59,20 +60,3 @@ export void Console::Log(const std::string& message, ImportanceLevel importance)
 		break;
 	}
 }
-
-////////////////////////////////////////////////////////////
-/// \class Console
-///
-/// Class used to output messages of differents importance
-/// levels used to understand the gravity of the problem.
-/// 
-/// The importance parameter defaults to BASIC.
-/// 
-/// Example usage : 
-/// 
-/// \code 
-/// Console::Log("Error message", CRITICAL);
-/// Console::Log("Problematic", PROBLEM);
-/// Console::Log("Just a message");
-/// \endcode
-////////////////////////////////////////////////////////////
