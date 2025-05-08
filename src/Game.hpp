@@ -14,6 +14,8 @@ private:
 	sf::Clock Clock;
 	bool m_isRunning;
 	float m_deltaTime;
+	Menu m_currentMenu;
+	Language m_gameLanguage;
 
 public:
 	Game();

@@ -2,6 +2,8 @@ module;
 
 #include <SFML/Graphics.hpp>
 #include <concepts>
+#include <locale>
+#include <string>
 
 export module GameMenus;
 
@@ -40,8 +42,7 @@ namespace {
 /// \brief Concepts used for templates
 ////////////////////////////////////////////////////////////
 template<typename T>
-concept CanBeCentered = requires(T elem)
-{
+concept CanBeCentered = requires(T elem) {
 	{elem.getGlobalBounds()} -> std::same_as<sf::FloatRect>;
 };
 
@@ -63,12 +64,76 @@ export enum Menu {
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief Loads every element contained in all game menus
+/// \brief Enumeration of the different supported languages.
 ////////////////////////////////////////////////////////////
-export void loadMenus() {
+export enum Language {
+	English, /// < English language, default if no locale found
+	French,  /// < French language,
+	Spanish, /// < Spanish language
+	German   /// < German language
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Returns the user's language, defaults to english.
+////////////////////////////////////////////////////////////
+std::pair<std::string, std::string> getNormalizedLangCode() {
+    std::string userLanguage = std::setlocale(LC_ALL, "");
+
+	// Handle fallbacks
+	if (userLanguage == "" || userLanguage == "C" || userLanguage == "POSIX")
+		return std::pair("English", "en");
+
+	std::unordered_map<std::string, std::string> languages = {
+		{"en", "English"},
+		{"fr", "French"},
+		{"es", "Spanish"},
+		{"de", "German"}
+	};
+
+	// Values that can be safely returned
+	if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
+		return std::pair(languages[userLanguage], userLanguage);
+
+	// POSIX / UNIX style
+	if (userLanguage.size() >= 3 && userLanguage[2] == '_') {
+		userLanguage = userLanguage.substr(0, 2);
+		if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
+			return std::pair(languages[userLanguage], userLanguage);
+		return std::pair("English", "en");
+	}
+
+	// Windows style
+    if (const size_t underscore = userLanguage.find('_'); underscore != std::string::npos) {
+		userLanguage = userLanguage.substr(0, underscore);
+		std::transform(userLanguage.begin(), userLanguage.end(), userLanguage.begin(), ::tolower);
+		userLanguage = userLanguage.substr(0, 2);
+		if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
+			return std::pair(languages[userLanguage], userLanguage);
+		return std::pair("English", "en");
+	}
+
+	// Defaults to English.
+	Console::Log("Unsupported language : \"" + userLanguage + "\", defaulting to English.", PROBLEM);
+    return std::pair("English", "en");
+}
+
+////////////////////////////////////////////////////////////
+/// \brief Loads every element contained in all game menus
+///
+/// \param toSpecify : Language to specify
+////////////////////////////////////////////////////////////
+export void loadMenus(Language& toSpecify) {
 	if (calledLoadMenus)
 		return;
+
+	Console::Log("Detected language : " + getNormalizedLangCode().first);
+	// Specifying the game language
+	if (getNormalizedLangCode().second == "en") toSpecify = English;
+	else if (getNormalizedLangCode().second == "fr") toSpecify = French;
+	else if (getNormalizedLangCode().second == "es") toSpecify = Spanish;
+	else if (getNormalizedLangCode().second == "de") toSpecify = German;
 	Console::Log("Loading menus...");
+
 	calledLoadMenus = true;
 }
 
@@ -79,7 +144,7 @@ export void loadMenus() {
 /// \param window : Window affected by the menu setup
 /// \param toSetup : Menu to be setup
 ////////////////////////////////////////////////////////////
-export void setupMenu(const sf::RenderWindow& window, const Menu toSetup) {
+export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 	const float xPercent = static_cast<float>(window.getSize().x) / 100.f;
 	const float yPercent = static_cast<float>(window.getSize().y) / 100.f;
 
@@ -90,7 +155,7 @@ export void setupMenu(const sf::RenderWindow& window, const Menu toSetup) {
 
 	switch (toSetup) {
 		case Start:
-			Console::Log("Loading startMenu...");
+			Console::Log("Loading the start menu...");
 			// Play button
 			playButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
 			playButton.setOutlineThickness(3);
@@ -124,7 +189,7 @@ export void setupMenu(const sf::RenderWindow& window, const Menu toSetup) {
 			quitButtonText.setString("Quit");
 			quitButtonText.setFillColor(sf::Color::Black);
 			quitButtonText.setPosition(quitButton.getPosition() + centerShape(quitButton) - centerShape(quitButtonText));
-		break;
+			break;
 
 	case Settings:
 	case In_Game:
@@ -139,67 +204,61 @@ export void setupMenu(const sf::RenderWindow& window, const Menu toSetup) {
 /// \param window : Window affected by the event polling
 /// \param toPoll : Menu targeted by the event polling
 ////////////////////////////////////////////////////////////
-export int pollGameEvents(sf::RenderWindow& window, const Menu toPoll) {
-	while (const std::optional event = window.pollEvent())
-	{
-		if (event->is<sf::Event::Closed>())
-		{
+export int pollGameEvents(sf::RenderWindow& window, Menu& toPoll) {
+	// Note: This is a very long function, wrap the parts you don't want to modify.
+	while (const std::optional event = window.pollEvent()) {
+		if (event->is<sf::Event::Closed>()) {
 			return -1;
 		}
-		if (toPoll == Start)
-		{
-			if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
-			{
-				if (mouseButtonPressed->button == sf::Mouse::Button::Left)
-				{
-					if (playButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position)))
-					{
-						// Start game
+		// Start menu
+		if (toPoll == Start) {
+			// Mouse button pressed - Only triggers the buttons.
+			if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+				if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
+					// Starts the game
+					if (playButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position))) {
+						toPoll = In_Game;
+						return 0;
 					}
-					else if (settingsButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position)))
-					{
-						// Go to settings
+					// Goes to the settings
+					if (settingsButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position))) {
+						toPoll = Settings;
+						return 0;
 					}
-					else if (quitButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position)))
-					{
+					// Terminates the game
+					if (quitButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position))) {
 						return -1;
 					}
 				}
 			}
-			if (const auto* mouseMoved = event->getIf<sf::Event::MouseMoved>())
-			{
-				if (playButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position)))
-				{
+			// Mouse moved - Only colors the buttons.
+			if (const auto* mouseMoved = event->getIf<sf::Event::MouseMoved>()) {
+				if (playButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position))) {
 					playButton.setFillColor(buttonColorHovered);
 				}
-				else
-				{
+				else {
 					playButton.setFillColor(sf::Color::White);
 				}
-				if (settingsButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position)))
-				{
+				if (settingsButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position))) {
 					settingsButton.setFillColor(buttonColorHovered);
 				}
-				else
-				{
+				else {
 					settingsButton.setFillColor(sf::Color::White);
 				}
-				if (quitButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position)))
-				{
+				if (quitButton.getGlobalBounds().contains(sf::Vector2<float>(mouseMoved->position))) {
 					quitButton.setFillColor(buttonColorHovered);
 				}
-				else
-				{
+				else {
 					quitButton.setFillColor(sf::Color::White);
 				}
 			}
 		}
-		else if (toPoll == Settings)
-		{
+		// Settings menu
+		else if (toPoll == Settings) {
 
 		}
-		else if (toPoll == In_Game)
-		{
+		// In game
+		else if (toPoll == In_Game) {
 
 		}
 	}

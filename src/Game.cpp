@@ -5,6 +5,8 @@ Game::Game() :
 {
 	m_deltaTime = 0.f;
 	m_isRunning = true;
+	m_currentMenu = Start;
+	m_gameLanguage = English;
 }
 
 Game::~Game() = default;
@@ -31,14 +33,14 @@ void Game::init() {
 	loadImages();
 	setupCursor(m_window);
 	setupIcon(m_window);
-	loadMenus();
+	loadMenus(m_gameLanguage);
 	setupMenu(m_window, Start);
 
 	Console::Log("Finished game initialization.");
 }
 
 void Game::pollEvents() {
-	if (pollGameEvents(m_window, Start) != 0)
+	if (pollGameEvents(m_window, m_currentMenu) != 0)
 		m_isRunning = false;
 }
 

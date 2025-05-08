@@ -8,10 +8,14 @@ module;
 
 export module GameConsole;
 
+////////////////////////////////////////////////////////////
+/// \brief Enumeration of the different importance levels
+/// of a console log
+////////////////////////////////////////////////////////////
 export enum ImportanceLevel {
-	BASIC,
-	PROBLEM,
-	CRITICAL
+	BASIC,   /// < Used for default messages
+	PROBLEM, /// < Used to signal a mistake
+	CRITICAL /// < Used to signal an error / an exception
 };
 
 ////////////////////////////////////////////////////////////
@@ -19,15 +23,24 @@ export enum ImportanceLevel {
 ////////////////////////////////////////////////////////////
 export class Console {
 public:
+	Console() = delete;
 	static void Log(const std::string& message, ImportanceLevel importance = BASIC);
 };
 
-export void Console::Log(const std::string& message, ImportanceLevel importance) {
+////////////////////////////////////////////////////////////
+/// \brief Outputs timed messages in the console
+///
+/// \param message : Message to be printed
+/// \param importance : Optional importance parameter,
+/// default value is BASIC
+////////////////////////////////////////////////////////////
+export void Console::Log(const std::string& message, const ImportanceLevel importance) {
 	// Get a formatted HH:MM:SS string of the current time (e.g: 11:23:54)
 	std::tm newTime;
 	const std::time_t now = std::time(nullptr);
 	std::string time;
-	// Checks if localtime_s() was successful
+
+	// Checks if localtime_s() was unsuccessful
 	if (localtime_s(&newTime, &now) != 0) {
 		time = "Unknown time";
 	}
@@ -36,6 +49,7 @@ export void Console::Log(const std::string& message, ImportanceLevel importance)
 		oss << std::put_time(&newTime, "%H:%M:%S");
 		time = oss.str();
 	}
+
 	// Prints console message depending on the importance level (default = BASIC)
 	std::cout << "---" << '\n';
 	std::cout << "[" << time << "] ";
