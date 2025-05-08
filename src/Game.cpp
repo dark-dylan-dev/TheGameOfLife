@@ -20,6 +20,8 @@ void Game::run() {
 
 	// Save shapes, progress and advancements here
 
+	Console::Log("Game terminated");
+
 	m_window.close();
 }
 

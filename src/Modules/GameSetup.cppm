@@ -1,6 +1,7 @@
 module;
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 export module GameSetup;
 
@@ -18,17 +19,23 @@ namespace {
 ///
 /// \param window : Window that prints the splash screen
 ////////////////////////////////////////////////////////////
-export void splashScreen(sf::RenderWindow& window) {}
+export void splashScreen(sf::RenderWindow& window) {
+	Console::Log("Setting up the splash screen...");
+}
 
 ////////////////////////////////////////////////////////////
 /// \brief Loads images used by the app.
 ////////////////////////////////////////////////////////////
-export void loadImages() {}
+export void loadImages() {
+	Console::Log("Loading images...");
+}
 
 ////////////////////////////////////////////////////////////
 /// \brief Loads fonts used by the app.
 ////////////////////////////////////////////////////////////
-export void loadFonts() {}
+export void loadFonts() {
+	Console::Log("Loading fonts...");
+}
 
 ////////////////////////////////////////////////////////////
 /// \brief Sets up the mouse cursor.
@@ -36,6 +43,7 @@ export void loadFonts() {}
 /// \param Window affected by the cursor modification
 ////////////////////////////////////////////////////////////
 export void setupCursor(sf::RenderWindow& window) {
+	Console::Log("Setting up cursor...");
 	window.setMouseCursor(cursor);
 }
 
@@ -45,5 +53,6 @@ export void setupCursor(sf::RenderWindow& window) {
 /// \param Window affected by the icon modification
 ////////////////////////////////////////////////////////////
 export void setupIcon(sf::RenderWindow& window) {
+	Console::Log("Setting up icon...");
 	window.setIcon(appIcon);
 }

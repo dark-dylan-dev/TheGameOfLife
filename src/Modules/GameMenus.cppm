@@ -68,6 +68,7 @@ export enum Menu {
 export void loadMenus() {
 	if (calledLoadMenus)
 		return;
+	Console::Log("Loading menus...");
 	calledLoadMenus = true;
 }
 
@@ -88,40 +89,41 @@ export void setupMenu(const sf::RenderWindow& window, const Menu toSetup) {
 	};
 
 	switch (toSetup) {
-	case Start:
-		// Play button
-		playButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-		playButton.setOutlineThickness(3);
-		playButton.setFillColor(sf::Color::White);
-		playButton.setOutlineColor(sf::Color::Black);
-		playButton.setPosition(screenCenter - centerShape(playButton) - sf::Vector2f{ 0.f, playButton.getSize().y });
-		// ...Text
-		playButtonText.setFont(pixelMix);
-		playButtonText.setString("Play");
-		playButtonText.setFillColor(sf::Color::Black);
-		playButtonText.setPosition(playButton.getPosition() + centerShape(playButton) - centerShape(playButtonText));
-		// Settings button
-		settingsButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-		settingsButton.setOutlineThickness(3);
-		settingsButton.setFillColor(sf::Color::White);
-		settingsButton.setOutlineColor(sf::Color::Black);
-		settingsButton.setPosition(screenCenter - centerShape(playButton));
-		// ...Text
-		settingsButtonText.setFont(pixelMix);
-		settingsButtonText.setString("Settings");
-		settingsButtonText.setFillColor(sf::Color::Black);
-		settingsButtonText.setPosition(settingsButton.getPosition() + centerShape(settingsButton) - centerShape(settingsButtonText));
-		// Quit button
-		quitButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-		quitButton.setOutlineThickness(3);
-		quitButton.setFillColor(sf::Color::White);
-		quitButton.setOutlineColor(sf::Color::Black);
-		quitButton.setPosition(screenCenter - centerShape(quitButton) + sf::Vector2f{ 0.f, quitButton.getSize().y });
-		// ...Text
-		quitButtonText.setFont(pixelMix);
-		quitButtonText.setString("Quit");
-		quitButtonText.setFillColor(sf::Color::Black);
-		quitButtonText.setPosition(quitButton.getPosition() + centerShape(quitButton) - centerShape(quitButtonText));
+		case Start:
+			Console::Log("Loading startMenu...");
+			// Play button
+			playButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
+			playButton.setOutlineThickness(3);
+			playButton.setFillColor(sf::Color::White);
+			playButton.setOutlineColor(sf::Color::Black);
+			playButton.setPosition(screenCenter - centerShape(playButton) - sf::Vector2f{ 0.f, playButton.getSize().y });
+			// ...Text
+			playButtonText.setFont(pixelMix);
+			playButtonText.setString("Play");
+			playButtonText.setFillColor(sf::Color::Black);
+			playButtonText.setPosition(playButton.getPosition() + centerShape(playButton) - centerShape(playButtonText));
+			// Settings button
+			settingsButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
+			settingsButton.setOutlineThickness(3);
+			settingsButton.setFillColor(sf::Color::White);
+			settingsButton.setOutlineColor(sf::Color::Black);
+			settingsButton.setPosition(screenCenter - centerShape(playButton));
+			// ...Text
+			settingsButtonText.setFont(pixelMix);
+			settingsButtonText.setString("Settings");
+			settingsButtonText.setFillColor(sf::Color::Black);
+			settingsButtonText.setPosition(settingsButton.getPosition() + centerShape(settingsButton) - centerShape(settingsButtonText));
+			// Quit button
+			quitButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
+			quitButton.setOutlineThickness(3);
+			quitButton.setFillColor(sf::Color::White);
+			quitButton.setOutlineColor(sf::Color::Black);
+			quitButton.setPosition(screenCenter - centerShape(quitButton) + sf::Vector2f{ 0.f, quitButton.getSize().y });
+			// ...Text
+			quitButtonText.setFont(pixelMix);
+			quitButtonText.setString("Quit");
+			quitButtonText.setFillColor(sf::Color::Black);
+			quitButtonText.setPosition(quitButton.getPosition() + centerShape(quitButton) - centerShape(quitButtonText));
 		break;
 
 	case Settings:
