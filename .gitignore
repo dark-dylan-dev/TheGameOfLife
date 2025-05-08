@@ -360,7 +360,9 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
-FodyWeavers.xsd!/cmake-build-debug/
+FodyWeavers.xsd
+
+# Binaries and .idea folder from CLion
 cmake-build-debug/
 cmake-build-relwithdebinfo/
 cmake-build-release/
