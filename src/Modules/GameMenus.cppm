@@ -3,6 +3,7 @@ module;
 #include <SFML/Graphics.hpp>
 #include <concepts>
 #include <locale>
+#include <numeric>
 #include <string>
 
 export module GameMenus;
@@ -11,15 +12,16 @@ import GameConsole;
 
 // Keeps the variables alive
 namespace {
-	// Ensures that loadMenus() is only called once
+	// Utilities variables
 	bool calledLoadMenus = false;
+	std::vector<int> fpsList;
 	// --- Start menu --- //
 	// ...Rectangles
 	sf::RectangleShape playButton;
 	sf::RectangleShape settingsButton;
 	sf::RectangleShape quitButton;
 	// ...Textures (<element>Texture)
-	sf::Texture startMenuBackgroundTexture("../assets/img/startMenu/background.png");
+	sf::Texture startMenuBackgroundTexture("../assets/img/startMenu/background.jpg");
 	// ...Sprites
 	sf::Sprite startMenuBackground(startMenuBackgroundTexture);
 	// ...Colors (<element>Color)
@@ -36,6 +38,9 @@ namespace {
 	// --- Settings menu --- //
 
 	// --- In game HUD --- //
+
+	// --- All menus --- //
+	sf::Text FPS(pixelMix, "FPS : 60", 24);
 }
 
 ////////////////////////////////////////////////////////////
@@ -50,7 +55,7 @@ concept CanBeCentered = requires(T elem) {
 /// \brief Useful for centering drawable content
 ////////////////////////////////////////////////////////////
 template <CanBeCentered T>
-static sf::Vector2f centerShape(const T& shape) {
+static constexpr sf::Vector2f centerShape(const T& shape) {
 	return sf::Vector2f{shape.getLocalBounds().size / 2.f };
 }
 
@@ -80,8 +85,8 @@ std::pair<std::string, std::string> getNormalizedLangCode() {
     std::string userLanguage = std::setlocale(LC_ALL, "");
 
 	// Handle fallbacks
-	if (userLanguage == "" || userLanguage == "C" || userLanguage == "POSIX")
-		return std::pair("English", "en");
+	if (userLanguage.empty() || userLanguage == "C" || userLanguage == "POSIX")
+		return {"English", "en"};
 
 	std::unordered_map<std::string, std::string> languages = {
 		{"en", "English"},
@@ -92,29 +97,29 @@ std::pair<std::string, std::string> getNormalizedLangCode() {
 
 	// Values that can be safely returned
 	if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
-		return std::pair(languages[userLanguage], userLanguage);
+		return {languages[userLanguage], userLanguage};
 
-	// POSIX / UNIX style
+	// POSIX / UNIX style e.g. fr_FR.UTF-8
 	if (userLanguage.size() >= 3 && userLanguage[2] == '_') {
 		userLanguage = userLanguage.substr(0, 2);
 		if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
-			return std::pair(languages[userLanguage], userLanguage);
-		return std::pair("English", "en");
+			return {languages[userLanguage], userLanguage};
+		return {"English", "en"};
 	}
 
-	// Windows style
+	// Windows style e.g. French_France.1252
     if (const size_t underscore = userLanguage.find('_'); underscore != std::string::npos) {
-		userLanguage = userLanguage.substr(0, underscore);
-		std::transform(userLanguage.begin(), userLanguage.end(), userLanguage.begin(), ::tolower);
-		userLanguage = userLanguage.substr(0, 2);
-		if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
-			return std::pair(languages[userLanguage], userLanguage);
-		return std::pair("English", "en");
+	    userLanguage = userLanguage.substr(0, underscore);
+    	std::transform(userLanguage.begin(), userLanguage.end(), userLanguage.begin(), ::tolower);
+    	userLanguage = userLanguage.substr(0, 2);
+    	if (userLanguage == "en" || userLanguage == "fr" || userLanguage == "es" || userLanguage == "de")
+    		return {languages[userLanguage], userLanguage};
+		return {"English", "en"};
 	}
 
 	// Defaults to English.
 	Console::Log("Unsupported language : \"" + userLanguage + "\", defaulting to English.", PROBLEM);
-    return std::pair("English", "en");
+    return {"English", "en"};
 }
 
 ////////////////////////////////////////////////////////////
@@ -132,8 +137,12 @@ export void loadMenus(Language& toSpecify) {
 	else if (getNormalizedLangCode().second == "fr") toSpecify = French;
 	else if (getNormalizedLangCode().second == "es") toSpecify = Spanish;
 	else if (getNormalizedLangCode().second == "de") toSpecify = German;
-	Console::Log("Loading menus...");
 
+	Console::Log("Loading menus...");
+	// TODO: Setup locale strings to texts here.
+
+	// Reserves the first 10 allocations for the FPS list - used in the updateLoop().
+	fpsList.reserve(10);
 	calledLoadMenus = true;
 }
 
@@ -156,20 +165,23 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 	switch (toSetup) {
 		case Start:
 			Console::Log("Loading the start menu...");
+			// All menus
+			FPS.setFillColor(sf::Color::White);
+			FPS.setPosition(sf::Vector2f(screenCenter.x - centerShape(FPS).x, yPercent * 1.0f));
 			// Play button
-			playButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-			playButton.setOutlineThickness(3);
+			playButton.setSize(sf::Vector2f(xPercent * 25.0f, yPercent * 10.0f));
+			playButton.setOutlineThickness(3.0f);
 			playButton.setFillColor(sf::Color::White);
 			playButton.setOutlineColor(sf::Color::Black);
-			playButton.setPosition(screenCenter - centerShape(playButton) - sf::Vector2f{ 0.f, playButton.getSize().y });
+			playButton.setPosition(screenCenter - centerShape(playButton) - sf::Vector2f{ 0.0f, playButton.getSize().y });
 			// ...Text
 			playButtonText.setFont(pixelMix);
 			playButtonText.setString("Play");
 			playButtonText.setFillColor(sf::Color::Black);
 			playButtonText.setPosition(playButton.getPosition() + centerShape(playButton) - centerShape(playButtonText));
 			// Settings button
-			settingsButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-			settingsButton.setOutlineThickness(3);
+			settingsButton.setSize(sf::Vector2f(xPercent * 25.0f, yPercent * 10.0f));
+			settingsButton.setOutlineThickness(3.0f);
 			settingsButton.setFillColor(sf::Color::White);
 			settingsButton.setOutlineColor(sf::Color::Black);
 			settingsButton.setPosition(screenCenter - centerShape(playButton));
@@ -179,11 +191,11 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 			settingsButtonText.setFillColor(sf::Color::Black);
 			settingsButtonText.setPosition(settingsButton.getPosition() + centerShape(settingsButton) - centerShape(settingsButtonText));
 			// Quit button
-			quitButton.setSize(sf::Vector2f(xPercent * 25.f, yPercent * 10.f));
-			quitButton.setOutlineThickness(3);
+			quitButton.setSize(sf::Vector2f(xPercent * 25.0f, yPercent * 10.0f));
+			quitButton.setOutlineThickness(3.0f);
 			quitButton.setFillColor(sf::Color::White);
 			quitButton.setOutlineColor(sf::Color::Black);
-			quitButton.setPosition(screenCenter - centerShape(quitButton) + sf::Vector2f{ 0.f, quitButton.getSize().y });
+			quitButton.setPosition(screenCenter - centerShape(quitButton) + sf::Vector2f{ 0.0f, quitButton.getSize().y });
 			// ...Text
 			quitButtonText.setFont(pixelMix);
 			quitButtonText.setString("Quit");
@@ -199,30 +211,46 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 }
 
 ////////////////////////////////////////////////////////////
+/// \brief Sets the FPS text to an approximative FPS value.
+///
+/// \param deltaTime The time between two frames in seconds.
+////////////////////////////////////////////////////////////
+export void calculateFPS(const float& deltaTime) {
+	const int fpsValue = static_cast<int>(1.0f/deltaTime);
+	fpsList.emplace_back(fpsValue);
+	if (fpsList.size() == 10) {
+		const auto avgFPS = std::reduce(fpsList.begin(), fpsList.end(), 0) / fpsList.size();
+		FPS.setString("FPS : " + std::to_string(avgFPS));
+		fpsList.clear();
+		fpsList.reserve(10);
+	}
+}
+
+////////////////////////////////////////////////////////////
 /// \brief Polls the events of a specified menu
 ///
 /// \param window : Window affected by the event polling
-/// \param toPoll : Menu targeted by the event polling
+/// \param currentMenu : Menu targeted by the event polling
 ////////////////////////////////////////////////////////////
-export int pollGameEvents(sf::RenderWindow& window, Menu& toPoll) {
+export int pollGameEvents(sf::RenderWindow& window, Menu& currentMenu) {
 	// Note: This is a very long function, wrap the parts you don't want to modify.
 	while (const std::optional event = window.pollEvent()) {
 		if (event->is<sf::Event::Closed>()) {
 			return -1;
 		}
 		// Start menu
-		if (toPoll == Start) {
+		if (currentMenu == Start) {
 			// Mouse button pressed - Only triggers the buttons.
 			if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 				if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
 					// Starts the game
 					if (playButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position))) {
-						toPoll = In_Game;
+						currentMenu = In_Game;
 						return 0;
 					}
 					// Goes to the settings
 					if (settingsButton.getGlobalBounds().contains(sf::Vector2<float>(mouseButtonPressed->position))) {
-						toPoll = Settings;
+						currentMenu = Settings;
 						return 0;
 					}
 					// Terminates the game
@@ -254,12 +282,12 @@ export int pollGameEvents(sf::RenderWindow& window, Menu& toPoll) {
 			}
 		}
 		// Settings menu
-		else if (toPoll == Settings) {
-
+		else if (currentMenu == Settings) {
+			// TODO: Implement the settings menu
 		}
 		// In game
-		else if (toPoll == In_Game) {
-
+		else if (currentMenu == In_Game) {
+			// TODO: Implement the in-game HUD
 		}
 	}
 	return 0;
@@ -271,7 +299,7 @@ export int pollGameEvents(sf::RenderWindow& window, Menu& toPoll) {
 /// \param window : Window affected by the draw call
 /// \param toDraw : Menu to be drawn
 ////////////////////////////////////////////////////////////
-export void drawMenu(sf::RenderWindow &window, const Menu toDraw) {
+export void drawMenu(sf::RenderWindow &window, const Menu& toDraw) {
 	switch (toDraw) {
 		case Start:
 			window.draw(startMenuBackground);
@@ -281,11 +309,13 @@ export void drawMenu(sf::RenderWindow &window, const Menu toDraw) {
 			window.draw(settingsButtonText);
 			window.draw(quitButton);
 			window.draw(quitButtonText);
-			break;
+			window.draw(FPS);
+		break;
 
-	case Settings:
-	case In_Game:
-	default:
+		case Settings:
+		case In_Game:
+		default:
+			window.draw(FPS);
 		break;
 	}
 }

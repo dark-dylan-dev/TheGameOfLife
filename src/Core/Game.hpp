@@ -11,9 +11,10 @@ import GameMenus;
 class Game {
 private:
 	sf::RenderWindow m_window;
-	sf::Clock Clock;
+	sf::Clock m_clock;
 	bool m_isRunning;
 	float m_deltaTime;
+	float m_refreshFPS;
 	Menu m_currentMenu;
 	Language m_gameLanguage;
 

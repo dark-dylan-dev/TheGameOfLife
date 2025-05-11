@@ -4,7 +4,6 @@ module;
 #include <iomanip>
 #include <string>
 #include <ctime>
-#include <time.h>
 
 export module GameConsole;
 
@@ -24,7 +23,7 @@ export enum ImportanceLevel {
 export class Console {
 public:
 	Console() = delete;
-	static void Log(const std::string& message, ImportanceLevel importance = BASIC);
+	static void Log(const std::string& message, const ImportanceLevel& importance = BASIC);
 };
 
 ////////////////////////////////////////////////////////////
@@ -34,7 +33,7 @@ public:
 /// \param importance : Optional importance parameter,
 /// default value is BASIC
 ////////////////////////////////////////////////////////////
-export void Console::Log(const std::string& message, const ImportanceLevel importance) {
+export void Console::Log(const std::string& message, const ImportanceLevel& importance) {
 	// Get a formatted HH:MM:SS string of the current time (e.g: 11:23:54)
 	std::tm newTime;
 	const std::time_t now = std::time(nullptr);
@@ -55,22 +54,22 @@ export void Console::Log(const std::string& message, const ImportanceLevel impor
 	std::cout << "[" << time << "] ";
 
 	switch (importance) {
-	case BASIC:
-		std::cout << "Info" << '\n'
-			<< " > " << message << '\n';
-		break;
+		case BASIC:
+			std::cout << "Info" << '\n'
+				<< " > " << message << '\n';
+			break;
 
-	case PROBLEM:
-		std::cout << "Issue" << '\n'
-			<< " > " << message << '\n';
-		break;
+		case PROBLEM:
+			std::cout << "Issue" << '\n'
+				<< " > " << message << '\n';
+			break;
 
-	case CRITICAL:
-		std::cout << "Critical" << '\n'
-			<< " > " << message << '\n';
-		break;
+		case CRITICAL:
+			std::cout << "Critical" << '\n'
+				<< " > " << message << '\n';
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }

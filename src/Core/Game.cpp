@@ -3,10 +3,12 @@
 Game::Game() :
 	m_window(sf::VideoMode::getDesktopMode(), "The Game Of Life", sf::State::Fullscreen)
 {
-	m_deltaTime = 0.f;
+	m_deltaTime = 0.0f;
+	m_refreshFPS = 0.0f;
 	m_isRunning = true;
 	m_currentMenu = Start;
 	m_gameLanguage = English;
+	m_window.setFramerateLimit(60);
 }
 
 Game::~Game() = default;
@@ -45,14 +47,15 @@ void Game::pollEvents() {
 }
 
 void Game::updateLoop() {
-	m_deltaTime = Clock.restart().asSeconds();
+	m_deltaTime = m_clock.restart().asSeconds();
+	calculateFPS(m_deltaTime);
 }
 
 void Game::render() {
 	m_window.clear();
 
 	// Draw
-	drawMenu(m_window, Start);
+	drawMenu(m_window, m_currentMenu);
 
 	m_window.display();
 }

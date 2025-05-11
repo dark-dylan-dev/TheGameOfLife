@@ -19,8 +19,8 @@ target_sources(TheGameOfLife
         Modules/GameMenus.cppm
         Modules/GameConsole.cppm
         PRIVATE
-        Game.cpp
-        Game.hpp
+        Core/Game.cpp
+        Core/Game.hpp
 )
 
 # Requires C++23

@@ -21,6 +21,7 @@ namespace {
 ////////////////////////////////////////////////////////////
 export void splashScreen(sf::RenderWindow& window) {
 	Console::Log("Setting up the splash screen...");
+	// TODO: Add a splash screen.
 }
 
 ////////////////////////////////////////////////////////////
@@ -43,7 +44,7 @@ export void loadFonts() {
 /// \param Window affected by the cursor modification
 ////////////////////////////////////////////////////////////
 export void setupCursor(sf::RenderWindow& window) {
-	Console::Log("Setting up cursor...");
+	Console::Log("Setting up the mouse cursor...");
 	window.setMouseCursor(cursor);
 }
 
@@ -53,6 +54,6 @@ export void setupCursor(sf::RenderWindow& window) {
 /// \param Window affected by the icon modification
 ////////////////////////////////////////////////////////////
 export void setupIcon(sf::RenderWindow& window) {
-	Console::Log("Setting up icon...");
+	Console::Log("Setting up the window icon...");
 	window.setIcon(appIcon);
 }
