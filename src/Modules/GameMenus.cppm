@@ -13,22 +13,21 @@ import GameConsole;
 // Keeps the variables alive
 namespace {
 	// Utilities variables
-	bool calledLoadMenus = false;
-	std::vector<int> fpsList;
+	bool calledLoadMenus(false);
+
 	// --- Start menu --- //
-	// ...Rectangles
+	// Rectangles
 	sf::RectangleShape playButton;
 	sf::RectangleShape settingsButton;
 	sf::RectangleShape quitButton;
-	// ...Textures (<element>Texture)
-	sf::Texture startMenuBackgroundTexture("../assets/img/startMenu/background.jpg");
-	// ...Sprites
-	sf::Sprite startMenuBackground(startMenuBackgroundTexture);
-	// ...Colors (<element>Color)
-	sf::Color buttonColorHovered(200U, 200U, 200U);
-	// ...Fonts
-	sf::Font pixelMix("../assets/fonts/pixelmix.ttf");
-	// ...Texts
+	// Textures (with associated sf::Sprite)
+	sf::Texture startMenuBGTexture;
+	sf::Sprite startMenuBG(startMenuBGTexture);
+	// Colors
+	sf::Color buttonColorHovered;
+	// Fonts
+	sf::Font pixelMix;
+	// Texts
 	sf::Text titleText(pixelMix);
 	sf::Text playButtonText(pixelMix);
 	sf::Text settingsButtonText(pixelMix);
@@ -40,7 +39,7 @@ namespace {
 	// --- In game HUD --- //
 
 	// --- All menus --- //
-	sf::Text FPS(pixelMix, "FPS : 60", 24);
+	sf::Text FPS(pixelMix);
 }
 
 ////////////////////////////////////////////////////////////
@@ -81,7 +80,7 @@ export enum Language {
 ////////////////////////////////////////////////////////////
 /// \brief Returns the user's language, defaults to english.
 ////////////////////////////////////////////////////////////
-std::pair<std::string, std::string> getNormalizedLangCode() {
+[[nodiscard]] std::pair<std::string, std::string> getLocaleLanguage() {
     std::string userLanguage = std::setlocale(LC_ALL, "");
 
 	// Handle fallbacks
@@ -122,27 +121,69 @@ std::pair<std::string, std::string> getNormalizedLangCode() {
     return {"English", "en"};
 }
 
+void applyDetectedLanguage(Language& gameLanguage) {
+	// Specifying the game language
+	if (getLocaleLanguage().second == "en") gameLanguage = English;
+	else if (getLocaleLanguage().second == "fr") gameLanguage = French;
+	else if (getLocaleLanguage().second == "es") gameLanguage = Spanish;
+	else if (getLocaleLanguage().second == "de") gameLanguage = German;
+}
+
+void loadMenuAssets() {
+	if (!startMenuBGTexture.loadFromFile("../assets/img/startMenu/background.jpg")) {
+		Console::Log("The start menu background didn't successfully load.", PROBLEM);
+	}
+	else startMenuBG = sf::Sprite(startMenuBGTexture);
+	if (!pixelMix.openFromFile("../assets/fonts/pixelmix.ttf")) {
+		Console::Log("PixelMix font didn't successfully load!", PROBLEM);
+	}
+}
+
+void setupMenuColors() {
+	buttonColorHovered = sf::Color(200U, 200U, 200U);
+}
+
+void setTextStrings(const Language& gameLanguage) {
+	if (gameLanguage == English) {
+		playButtonText.setString("Play");
+		settingsButtonText.setString("Settings");
+		quitButtonText.setString("Quit");
+	}
+	else if (gameLanguage == French) {
+		playButtonText.setString("Jouer");
+		settingsButtonText.setString("Parametres");
+		quitButtonText.setString("Quitter");
+	}
+	else if (gameLanguage == Spanish) {
+		playButtonText.setString("Jugar");
+		settingsButtonText.setString("Ajustes");
+		quitButtonText.setString("Dejar");
+	}
+	else if (gameLanguage == German) {
+		playButtonText.setString("Spielen");
+		settingsButtonText.setString("Einstellungen");
+		quitButtonText.setString("Gehen");
+	}
+}
+
 ////////////////////////////////////////////////////////////
 /// \brief Loads every element contained in all game menus
 ///
-/// \param toSpecify : Language to specify
+/// \param gameLanguage : Language used by the game
 ////////////////////////////////////////////////////////////
-export void loadMenus(Language& toSpecify) {
-	if (calledLoadMenus)
-		return;
+export void loadMenus(Language& gameLanguage) {
+	if (calledLoadMenus) return;
 
-	Console::Log("Detected language : " + getNormalizedLangCode().first);
-	// Specifying the game language
-	if (getNormalizedLangCode().second == "en") toSpecify = English;
-	else if (getNormalizedLangCode().second == "fr") toSpecify = French;
-	else if (getNormalizedLangCode().second == "es") toSpecify = Spanish;
-	else if (getNormalizedLangCode().second == "de") toSpecify = German;
+	Console::Log("Detected language : " + getLocaleLanguage().first);
+	applyDetectedLanguage(gameLanguage);
 
 	Console::Log("Loading menus...");
-	// TODO: Setup locale strings to texts here.
+	loadMenuAssets();
+	setupMenuColors();
 
-	// Reserves the first 10 allocations for the FPS list - used in the updateLoop().
-	fpsList.reserve(10);
+	Console::Log("Applying locale strings to texts...");
+	setTextStrings(gameLanguage);
+
 	calledLoadMenus = true;
 }
 
@@ -166,6 +207,8 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 		case Start:
 			Console::Log("Loading the start menu...");
 			// All menus
+			FPS.setCharacterSize(24);
+			FPS.setString("FPS : 60");
 			FPS.setFillColor(sf::Color::White);
 			FPS.setPosition(sf::Vector2f(screenCenter.x - centerShape(FPS).x, yPercent * 1.0f));
 			// Play button
@@ -175,8 +218,6 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 			playButton.setOutlineColor(sf::Color::Black);
 			playButton.setPosition(screenCenter - centerShape(playButton) - sf::Vector2f{ 0.0f, playButton.getSize().y });
 			// ...Text
-			playButtonText.setFont(pixelMix);
-			playButtonText.setString("Play");
 			playButtonText.setFillColor(sf::Color::Black);
 			playButtonText.setPosition(playButton.getPosition() + centerShape(playButton) - centerShape(playButtonText));
 			// Settings button
@@ -186,8 +227,6 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 			settingsButton.setOutlineColor(sf::Color::Black);
 			settingsButton.setPosition(screenCenter - centerShape(playButton));
 			// ...Text
-			settingsButtonText.setFont(pixelMix);
-			settingsButtonText.setString("Settings");
 			settingsButtonText.setFillColor(sf::Color::Black);
 			settingsButtonText.setPosition(settingsButton.getPosition() + centerShape(settingsButton) - centerShape(settingsButtonText));
 			// Quit button
@@ -197,8 +236,6 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 			quitButton.setOutlineColor(sf::Color::Black);
 			quitButton.setPosition(screenCenter - centerShape(quitButton) + sf::Vector2f{ 0.0f, quitButton.getSize().y });
 			// ...Text
-			quitButtonText.setFont(pixelMix);
-			quitButtonText.setString("Quit");
 			quitButtonText.setFillColor(sf::Color::Black);
 			quitButtonText.setPosition(quitButton.getPosition() + centerShape(quitButton) - centerShape(quitButtonText));
 			break;
@@ -216,14 +253,7 @@ export void setupMenu(const sf::RenderWindow& window, const Menu& toSetup) {
 /// \param deltaTime The time between two frames in seconds.
 ////////////////////////////////////////////////////////////
 export void calculateFPS(const float& deltaTime) {
-	const int fpsValue = static_cast<int>(1.0f/deltaTime);
-	fpsList.emplace_back(fpsValue);
-	if (fpsList.size() == 10) {
-		const auto avgFPS = std::reduce(fpsList.begin(), fpsList.end(), 0) / fpsList.size();
-		FPS.setString("FPS : " + std::to_string(avgFPS));
-		fpsList.clear();
-		fpsList.reserve(10);
-	}
+	FPS.setString("FPS : " + std::to_string(static_cast<int>(1.0f/deltaTime)));
 }
 
 ////////////////////////////////////////////////////////////
@@ -302,7 +332,7 @@ export int pollGameEvents(sf::RenderWindow& window, Menu& currentMenu) {
 export void drawMenu(sf::RenderWindow &window, const Menu& toDraw) {
 	switch (toDraw) {
 		case Start:
-			window.draw(startMenuBackground);
+			window.draw(startMenuBG);
 			window.draw(playButton);
 			window.draw(playButtonText);
 			window.draw(settingsButton);

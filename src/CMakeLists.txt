@@ -10,6 +10,8 @@ set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 # Adding files
 add_executable(TheGameOfLife
     "main.cpp"
+        Graphics/Shapes/RoundedRectangle.hpp
+        Graphics/Shapes/RoundedRectangle.cpp
 )
 target_sources(TheGameOfLife
         PRIVATE

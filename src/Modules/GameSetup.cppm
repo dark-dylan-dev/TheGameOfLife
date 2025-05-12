@@ -1,7 +1,6 @@
 module;
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 export module GameSetup;
 
@@ -9,19 +8,9 @@ import GameConsole;
 
 // Keeps the variables alive
 namespace {
-	sf::Image cursorImg("../assets/cursors/pointer.png");
-	sf::Cursor cursor(cursorImg.getPixelsPtr(), cursorImg.getSize(), sf::Vector2u(0U, 0U));
-	sf::Image appIcon("../assets/img/icon.png");
-}
-
-////////////////////////////////////////////////////////////
-/// \brief Loads images used by the app.
-///
-/// \param window : Window that prints the splash screen
-////////////////////////////////////////////////////////////
-export void splashScreen(sf::RenderWindow& window) {
-	Console::Log("Setting up the splash screen...");
-	// TODO: Add a splash screen.
+	sf::Image cursorImg;
+	sf::Image appIcon;
+	sf::Cursor cursor(sf::Cursor::Type::Arrow);
 }
 
 ////////////////////////////////////////////////////////////
@@ -29,13 +18,12 @@ export void splashScreen(sf::RenderWindow& window) {
 ////////////////////////////////////////////////////////////
 export void loadImages() {
 	Console::Log("Loading images...");
-}
-
-////////////////////////////////////////////////////////////
-/// \brief Loads fonts used by the app.
-////////////////////////////////////////////////////////////
-export void loadFonts() {
-	Console::Log("Loading fonts...");
+	if (!cursorImg.loadFromFile("../assets/cursors/pointer.png")) {
+		Console::Log("Cursor texture didn't successfully load.", PROBLEM);
+	}
+	if (!appIcon.loadFromFile("../assets/img/icon.png")) {
+		Console::Log("Window icon didn't successfully load.", PROBLEM);
+	}
 }
 
 ////////////////////////////////////////////////////////////
@@ -45,6 +33,7 @@ export void loadFonts() {
 ////////////////////////////////////////////////////////////
 export void setupCursor(sf::RenderWindow& window) {
 	Console::Log("Setting up the mouse cursor...");
+	cursor = sf::Cursor(cursorImg.getPixelsPtr(), cursorImg.getSize(), {0U, 0U});
 	window.setMouseCursor(cursor);
 }
 
