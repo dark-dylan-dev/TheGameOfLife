@@ -9,7 +9,8 @@ public:
     /// \brief Default constructor
     ///
     ////////////////////////////////////////////////////////////
-    explicit RoundedRectangleShape(sf::Vector2f size = {});
+    explicit RoundedRectangleShape(sf::Vector2f size = {}, float radius = 0.0f);
+
     ////////////////////////////////////////////////////////////
     /// \brief Set the size of the rectangle
     ///
@@ -29,6 +30,24 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] sf::Vector2f getSize() const;
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the corner radius of the rectangle
+    ///
+    /// \param radius New radius % of the rectangle's angles
+    ///
+    /// \see `getCornerRadius`
+    ///
+    ////////////////////////////////////////////////////////////
+    void setCornerRadius(float radius);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Gets the corner radius of the rectangle
+    ///
+    /// \return Radius % of the rectangle's angles
+    ///
+    ////////////////////////////////////////////////////////////
+    [[nodiscard]] float getCornerRadius() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the number of points defining the shape
@@ -70,5 +89,10 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    sf::Vector2f m_size; //!< Size of the rectangle
+    sf::Vector2f m_size;           //!< Size of the rectangle
+    float m_percentRadius;         //!< Rounded corners % radius
+    sf::CircleShape m_topLeft;     //!< Top left circle
+    sf::CircleShape m_topRight;    //!< Top right circle
+    sf::CircleShape m_bottomLeft;  //!< Bottom left circle
+    sf::CircleShape m_bottomRight; //!< Bottom right circle
 };

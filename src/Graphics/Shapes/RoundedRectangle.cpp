@@ -1,8 +1,9 @@
 #include "RoundedRectangle.hpp"
 
-RoundedRectangleShape::RoundedRectangleShape(sf::Vector2f size)
+RoundedRectangleShape::RoundedRectangleShape(const sf::Vector2f size, const float radius)
 {
     setSize(size);
+    setCornerRadius(radius);
 }
 
 
@@ -18,6 +19,21 @@ void RoundedRectangleShape::setSize(sf::Vector2f size)
 sf::Vector2f RoundedRectangleShape::getSize() const
 {
     return m_size;
+}
+
+
+////////////////////////////////////////////////////////////
+void RoundedRectangleShape::setCornerRadius(float radius)
+{
+    m_percentRadius = radius;
+    update();
+}
+
+
+////////////////////////////////////////////////////////////
+float RoundedRectangleShape::getCornerRadius() const
+{
+    return m_percentRadius;
 }
 
 

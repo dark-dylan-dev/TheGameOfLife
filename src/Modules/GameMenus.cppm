@@ -5,6 +5,7 @@ module;
 #include <locale>
 #include <numeric>
 #include <string>
+#include "../Graphics/Shapes/RoundedRectangle.hpp"
 
 export module GameMenus;
 
@@ -17,7 +18,7 @@ namespace {
 
 	// --- Start menu --- //
 	// Rectangles
-	sf::RectangleShape playButton;
+	RoundedRectangleShape playButton;
 	sf::RectangleShape settingsButton;
 	sf::RectangleShape quitButton;
 	// Textures (with associated sf::Sprite)
